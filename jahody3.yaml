@@ -87,6 +87,7 @@ mqtt:
 
 
 ota:
+  safe_mode: false
   password: ""
 
 logger:
