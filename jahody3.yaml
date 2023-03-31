@@ -282,7 +282,7 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
 
 
 deep_sleep:
-  wakeup_pin: 32
+#  wakeup_pin: 32
   id: deep_sleep_1
 
 
