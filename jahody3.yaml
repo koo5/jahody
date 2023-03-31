@@ -266,6 +266,7 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
     id: rtc
     update_interval: never
 
+  
   - platform: sntp
     id: ntp
     #timezone: Europe/Prague
