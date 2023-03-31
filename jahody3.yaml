@@ -328,7 +328,6 @@ number:
     initial_value: 60
     step: 1
     restore_value: true
-    initial_value: 0
     optimistic: true
 
 
