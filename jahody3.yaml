@@ -29,7 +29,7 @@ esphome:
             - if:
                 condition:
                     lambda: |-
-                        return (id(rtc).utcnow().is_valid() && id(rtc).utcnow().timestamp > 1680000000) && (id(rtc).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(rtc).utcnow().hour > id(hour).state);
+                        return (id(rtc).utcnow().is_valid() && id(rtc).utcnow().timestamp > 1680000000) && (id(rtc).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(rtc).utcnow().hour >= id(hour).state);
                 then:
                     - number.set:
                         id: last_pump_ts 
@@ -40,7 +40,8 @@ esphome:
                     - switch.turn_on: periodic_pump1
                     
                     # delka zalevani s/min/h
-                    - delay: 140s
+                    - delay: !lambda |-
+                                    return id(pump_length).state;
                     
                     - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
                     - switch.turn_off: periodic_pump1
@@ -318,3 +319,17 @@ number:
     restore_value: true
     initial_value: 0
     optimistic: true
+
+  - platform: template
+    id: pump_length
+    name: "pump_length"
+    min_value: 3
+    max_value: 3000
+    initial_value: 60
+    step: 1
+    restore_value: true
+    initial_value: 0
+    optimistic: true
+
+
+
