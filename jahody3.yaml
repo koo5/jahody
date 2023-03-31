@@ -73,6 +73,9 @@ wifi:
 
   - ssid: !secret ssid3
     password: !secret password3
+
+
+  reboot_timeout: 1h
   
   
 mqtt:
