@@ -32,7 +32,7 @@ esphome:
             - if:
                 condition:
                     lambda: |-
-                        return (id(rtc).is_valid() && id(rtc).utcnow().timestamp > 1680000000) && (id(rtc).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(rtc).utcnow().hour > id(hour).state);
+                        return (id(rtc).utcnow().is_valid() && id(rtc).utcnow().timestamp > 1680000000) && (id(rtc).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(rtc).utcnow().hour > id(hour).state);
                 then:
                     - number.set:
                         id: last_pump_ts 
@@ -72,9 +72,9 @@ wifi:
     password: !secret password
     manual_ip:
       static_ip: $ip
-      gateway: !secret gateway
+      gateway: $gateway
       subnet: 255.255.255.0
-      dns1: !secret dns1
+      dns1: $dns1
       dns2: 8.8.8.8
     
   
@@ -123,19 +123,94 @@ light:
     id: status
     pin: 2
 
-
-
+      
 switch:
-
   - platform: gpio
-    pin: 20
+    pin: 18
     id: periodic_pump1
     name: "periodic_pump1"
+    inverted: true
+
+  - platform: gpio
+    pin: 19
+    id: periodic_pump2
+    name: "periodic_pump2"
+    inverted: true
 
   - platform: restart
     id: manual_restart
     name: "Living Room Restart"
 
+
+
+
+binary_sensor:
+  - platform: gpio
+    id: button32
+    pin: 
+      inverted: true
+      number: 32
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_off: periodic_pump1
+        - logger.log: "..."
+
+  - platform: gpio
+    id: button33
+    pin: 
+      inverted: true
+      number: 33
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_on: periodic_pump1
+        - logger.log: "..."
+
+  - platform: gpio
+    id: button35
+    pin: 
+      inverted: true
+      number: 26
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_on: periodic_pump2
+        - logger.log: "..."
+
+  - platform: gpio
+    id: button34
+    pin: 
+      inverted: true
+      number: 27
+      mode: 
+        input: true
+        pullup: true
+    filters:
+      - delayed_on: 10ms
+    on_press:
+      then:
+        - switch.turn_off: periodic_pump2
+        - logger.log: "..."
+
+
+
+output:
+  - platform: gpio
+    pin: 25
+    id: tlacitek
 
 
 sun:
@@ -190,13 +265,6 @@ time:  # https://esphome.io/components/time/ds1307.html#ds1307-config-example
   - platform: ds1307
     id: rtc
     update_interval: never
-
-  - platform: homeassistant
-    on_time_sync:
-      then:
-        - logger.log: "rtc.write_time..."
-        - ds1307.write_time
-        - logger.log: "Synchronized clock."
 
   - platform: sntp
     id: ntp
