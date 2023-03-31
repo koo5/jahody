@@ -41,7 +41,7 @@ esphome:
                     
                     # delka zalevani s/min/h
                     - delay: !lambda |-
-                                    return id(pump_length).state;
+                                    return id(pump_length).state * 1000;
                     
                     - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
                     - switch.turn_off: periodic_pump1
