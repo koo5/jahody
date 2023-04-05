@@ -1,7 +1,7 @@
 
 substitutions:
   name: jahody
-
+  clock: rtc
 
 preferences:
   flash_write_interval: 30s
@@ -23,28 +23,34 @@ esphome:
                   sleep_duration: 1h
           else:
 
-            # tady je potreba ntp vymenit za rtc
-            # a po prvnim synchronizacnim bootu znova rebootnout
+            # pro rtc je potreba po prvnim synchronizacnim bootu znova rebootnout
 
             - if:
                 condition:
                     lambda: |-
-                        return (id(rtc).utcnow().is_valid() && id(rtc).utcnow().timestamp > 1680000000) && (id(rtc).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id(rtc).utcnow().hour >= id(hour).state);
+                        return (id($clock).utcnow().is_valid() && id($clock).utcnow().timestamp > 1680000000) && (id($clock).utcnow().timestamp - id(last_pump_ts).state > 60*60*20) && (id($clock).utcnow().hour >= id(hour).state);
                 then:
                     - number.set:
                         id: last_pump_ts 
                         value: !lambda |-
-                                  return id(rtc).utcnow().timestamp;
+                                  return id($clock).utcnow().timestamp;
                     - delay: 40s # flush
-                    - logger.log: "periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
+                    - logger.log:
+                        format: "%d periodic action!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!..."
+                        args: [ 'id($clock).utcnow()' ]
+
                     - switch.turn_on: periodic_pump1
                     
                     # delka zalevani s/min/h
                     - delay: !lambda |-
                                     return id(pump_length).state * 1000;
                     
-                    - logger.log: "periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+                    - logger.log:
+                        format: "%d periodic action offfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff..."
+                        args: [ 'id($clock).utcnow()' ]
+
                     - switch.turn_off: periodic_pump1
+                    - delay: 40s # flush
                     - logger.log: "sleep for 20h..."
                     - deep_sleep.enter:
                             id: deep_sleep_1
